@@ -25,7 +25,7 @@ namespace EnhancedStreamChat.Interfaces
         event OnRewardRedeemedHandler OnRewardRedeemed;
 
         void RunService();
-        void LaunchWebPortal(bool shouldLaunchPortal = true);
+        void LaunchWebApp(bool shouldLaunchWebApp = true);
 
         Task IrcStart();
         Task IrcStop();
