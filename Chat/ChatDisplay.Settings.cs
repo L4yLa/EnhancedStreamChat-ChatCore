@@ -384,7 +384,7 @@ namespace EnhancedStreamChat.Chat
         [UIAction("launch-web-app")]
         protected void LaunchWebApp()
         {
-            this._chatCoreManager.LaunchWebPortal();
+            this._chatCoreManager.LaunchWebApp();
         }
 
         [UIAction("launch-kofi")]
