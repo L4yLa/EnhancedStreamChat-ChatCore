@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace EnhancedStreamChat.Interfaces
 {
-    public interface ICatCoreManager
+    public interface IChatCoreManager
     {
         // 接続・認証
         event Action<IChatService> OnAuthenticatedStateChanged;

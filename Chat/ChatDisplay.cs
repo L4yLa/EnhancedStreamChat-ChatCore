@@ -396,7 +396,7 @@ namespace EnhancedStreamChat.Chat
 
         // ── ChatCore 対応済みイベントハンドラ ──────────────────────────────
 
-        private void CatCoreManager_OnChatConnected(IStreamingService service)
+        private void CatCoreManager_OnChatConnected(IChatService service)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"Success connected service. {service.GetType().Name}")
@@ -407,7 +407,7 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnJoinChannel(IStreamingService service, IChatChannel channel)
+        private void CatCoreManager_OnJoinChannel(IChatService service, IChatChannel channel)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"[{channel.Name}] Success joining channel {channel.Id}")
@@ -418,7 +418,7 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnLeaveChannel(IStreamingService service, IChatChannel channel)
+        private void CatCoreManager_OnLeaveChannel(IChatService service, IChatChannel channel)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"[{channel.Name}] Success leaved channel {channel.Id}")
@@ -429,17 +429,17 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnTextMessageReceived(IStreamingService service, IChatMessage message)
+        private void CatCoreManager_OnTextMessageReceived(IChatService service, IChatMessage message)
         {
             _ = this.OnTextMessageReceived(new ESCChatMessage(message), DateTime.Now);
         }
 
-        private void OnCatCoreManager_OnMessageDeleted(IStreamingService service, IChatChannel channel, string messageId)
+        private void OnCatCoreManager_OnMessageDeleted(IChatService service, string messageId)
         {
             this.OnMessageCleared(messageId);
         }
 
-        private void OnCatCoreManager_OnChatCleared(IStreamingService service, IChatChannel channel, string userId)
+        private void OnCatCoreManager_OnChatCleared(IChatService service, string userId)
         {
             this.OnChatCleared(userId);
         }
@@ -457,7 +457,7 @@ namespace EnhancedStreamChat.Chat
         private ImageView _bg;
         private bool _updateMessagePositions = false;
         private MemoryPoolContainer<EnhancedTextMeshProUGUIWithBackground> _textPoolContaner;
-        private ICatCoreManager _catCoreManager;
+        private IChatCoreManager _catCoreManager;
         private ChatMessageBuilder _chatMessageBuilder;
         private ESCFontManager _fontManager;
         private bool _disposedValue;
@@ -472,7 +472,7 @@ namespace EnhancedStreamChat.Chat
         #region // 構築・破棄
         [Inject]
         public void Constarct(EnhancedTextMeshProUGUIWithBackground.Pool pool, PluginConfig config,
-            ICatCoreManager catCoreManager, ChatMessageBuilder chatMessageBuilder, ESCFontManager fontManager)
+            IChatCoreManager catCoreManager, ChatMessageBuilder chatMessageBuilder, ESCFontManager fontManager)
         {
             this._textPoolContaner   = new MemoryPoolContainer<EnhancedTextMeshProUGUIWithBackground>(pool);
             this._chatConfig         = config;

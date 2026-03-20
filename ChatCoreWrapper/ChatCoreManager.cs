@@ -9,7 +9,7 @@ using Zenject;
 
 namespace EnhancedStreamChat.ChatCoreWrapper
 {
-    internal class ChatCoreManager : IDisposable, ICatCoreManager, IInitializable
+    internal class ChatCoreManager : IDisposable, IChatCoreManager, IInitializable
     {
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // イベント
@@ -71,7 +71,7 @@ namespace EnhancedStreamChat.ChatCoreWrapper
 
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // プライベートメソッド（イベント中継）
-        // OnLogin → ICatCoreManager の OnAuthenticatedStateChanged と OnChatConnected 両方に流す
+        // OnLogin → IChatCoreManager の OnAuthenticatedStateChanged と OnChatConnected 両方に流す
         private void StreamingService_OnLogin(IChatService service)
         {
             this.OnAuthenticatedStateChanged?.Invoke(service);
