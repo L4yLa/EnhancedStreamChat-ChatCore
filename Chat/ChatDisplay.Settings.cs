@@ -384,7 +384,7 @@ namespace EnhancedStreamChat.Chat
         [UIAction("launch-web-app")]
         protected void LaunchWebApp()
         {
-            this._catCoreManager.LaunchWebPortal();
+            this._chatCoreManager.LaunchWebPortal();
         }
 
         [UIAction("launch-kofi")]
@@ -421,7 +421,7 @@ namespace EnhancedStreamChat.Chat
             try {
                 this.ReconnectEnable = false;
                 await Task.Delay(s_reconnectDelay);
-                await this._catCoreManager.IrcStart();
+                await this._chatCoreManager.IrcStart();
             }
             catch (System.Exception e) {
                 Logger.Error(e);
@@ -437,7 +437,7 @@ namespace EnhancedStreamChat.Chat
             await this._connectSemaphore.WaitAsync();
             try {
                 await Task.Delay(s_reconnectDelay);
-                await this._catCoreManager.PubSubStart(instance);
+                await this._chatCoreManager.PubSubStart(instance);
             }
             catch (System.Exception e) {
                 Logger.Error(e);
