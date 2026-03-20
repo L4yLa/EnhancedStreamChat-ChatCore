@@ -66,12 +66,12 @@ namespace EnhancedStreamChat.Chat
             this._chatConfig.OnConfigChanged += this.Instance_OnConfigChanged;
             SceneManager.activeSceneChanged  += this.SceneManager_activeSceneChanged;
             // ── ChatCore 対応済みイベント購読 ──
-            this._catCoreManager.OnChatConnected       += this.CatCoreManager_OnChatConnected;
-            this._catCoreManager.OnJoinChannel         += this.CatCoreManager_OnJoinChannel;
-            this._catCoreManager.OnLeaveChannel        += this.CatCoreManager_OnLeaveChannel;
-            this._catCoreManager.OnTextMessageReceived += this.CatCoreManager_OnTextMessageReceived;
-            this._catCoreManager.OnMessageDeleted      += this.OnCatCoreManager_OnMessageDeleted;
-            this._catCoreManager.OnChatCleared         += this.OnCatCoreManager_OnChatCleared;
+            this._chatCoreManager.OnChatConnected       += this.ChatCoreManager_OnChatConnected;
+            this._chatCoreManager.OnJoinChannel         += this.ChatCoreManager_OnJoinChannel;
+            this._chatCoreManager.OnLeaveChannel        += this.ChatCoreManager_OnLeaveChannel;
+            this._chatCoreManager.OnTextMessageReceived += this.ChatCoreManager_OnTextMessageReceived;
+            this._chatCoreManager.OnMessageDeleted      += this.OnChatCoreManager_OnMessageDeleted;
+            this._chatCoreManager.OnChatCleared         += this.OnChatCoreManager_OnChatCleared;
             // OnFollow / OnRewardRedeemed は ChatCore v2 未サポートのため購読しない
         }
 
@@ -396,7 +396,7 @@ namespace EnhancedStreamChat.Chat
 
         // ── ChatCore 対応済みイベントハンドラ ──────────────────────────────
 
-        private void CatCoreManager_OnChatConnected(IChatService service)
+        private void ChatCoreManager_OnChatConnected(IChatService service)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"Success connected service. {service.GetType().Name}")
@@ -407,7 +407,7 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnJoinChannel(IChatService service, IChatChannel channel)
+        private void ChatCoreManager_OnJoinChannel(IChatService service, IChatChannel channel)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"[{channel.Name}] Success joining channel {channel.Id}")
@@ -418,7 +418,7 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnLeaveChannel(IChatService service, IChatChannel channel)
+        private void ChatCoreManager_OnLeaveChannel(IChatService service, IChatChannel channel)
         {
             var mes = new ESCChatMessage(Guid.NewGuid().ToString(),
                 $"[{channel.Name}] Success leaved channel {channel.Id}")
@@ -429,17 +429,17 @@ namespace EnhancedStreamChat.Chat
             _ = this.OnTextMessageReceived(mes, DateTime.Now);
         }
 
-        private void CatCoreManager_OnTextMessageReceived(IChatService service, IChatMessage message)
+        private void ChatCoreManager_OnTextMessageReceived(IChatService service, IChatMessage message)
         {
             _ = this.OnTextMessageReceived(new ESCChatMessage(message), DateTime.Now);
         }
 
-        private void OnCatCoreManager_OnMessageDeleted(IChatService service, string messageId)
+        private void OnChatCoreManager_OnMessageDeleted(IChatService service, string messageId)
         {
             this.OnMessageCleared(messageId);
         }
 
-        private void OnCatCoreManager_OnChatCleared(IChatService service, string userId)
+        private void OnChatCoreManager_OnChatCleared(IChatService service, string userId)
         {
             this.OnChatCleared(userId);
         }
@@ -457,7 +457,7 @@ namespace EnhancedStreamChat.Chat
         private ImageView _bg;
         private bool _updateMessagePositions = false;
         private MemoryPoolContainer<EnhancedTextMeshProUGUIWithBackground> _textPoolContaner;
-        private IChatCoreManager _catCoreManager;
+        private IChatCoreManager _chatCoreManager;
         private ChatMessageBuilder _chatMessageBuilder;
         private ESCFontManager _fontManager;
         private bool _disposedValue;
@@ -472,11 +472,11 @@ namespace EnhancedStreamChat.Chat
         #region // 構築・破棄
         [Inject]
         public void Constarct(EnhancedTextMeshProUGUIWithBackground.Pool pool, PluginConfig config,
-            IChatCoreManager catCoreManager, ChatMessageBuilder chatMessageBuilder, ESCFontManager fontManager)
+            IChatCoreManager chatCoreManager, ChatMessageBuilder chatMessageBuilder, ESCFontManager fontManager)
         {
             this._textPoolContaner   = new MemoryPoolContainer<EnhancedTextMeshProUGUIWithBackground>(pool);
             this._chatConfig         = config;
-            this._catCoreManager     = catCoreManager;
+            this._chatCoreManager     = chatCoreManager;
             this._chatMessageBuilder = chatMessageBuilder;
             this._fontManager        = fontManager;
         }
@@ -490,12 +490,12 @@ namespace EnhancedStreamChat.Chat
                         this._chatConfig.OnConfigChanged -= this.Instance_OnConfigChanged;
                         SceneManager.activeSceneChanged  -= this.SceneManager_activeSceneChanged;
                         // ── イベント解除 ──
-                        this._catCoreManager.OnChatConnected       -= this.CatCoreManager_OnChatConnected;
-                        this._catCoreManager.OnJoinChannel         -= this.CatCoreManager_OnJoinChannel;
-                        this._catCoreManager.OnLeaveChannel        -= this.CatCoreManager_OnLeaveChannel;
-                        this._catCoreManager.OnTextMessageReceived -= this.CatCoreManager_OnTextMessageReceived;
-                        this._catCoreManager.OnMessageDeleted      -= this.OnCatCoreManager_OnMessageDeleted;
-                        this._catCoreManager.OnChatCleared         -= this.OnCatCoreManager_OnChatCleared;
+                        this._chatCoreManager.OnChatConnected       -= this.ChatCoreManager_OnChatConnected;
+                        this._chatCoreManager.OnJoinChannel         -= this.ChatCoreManager_OnJoinChannel;
+                        this._chatCoreManager.OnLeaveChannel        -= this.ChatCoreManager_OnLeaveChannel;
+                        this._chatCoreManager.OnTextMessageReceived -= this.ChatCoreManager_OnTextMessageReceived;
+                        this._chatCoreManager.OnMessageDeleted      -= this.OnChatCoreManager_OnMessageDeleted;
+                        this._chatCoreManager.OnChatCleared         -= this.OnChatCoreManager_OnChatCleared;
                         this.StopAllCoroutines();
                         while (this._messages.TryDequeue(out var msg)) {
                             if (msg) {

@@ -50,14 +50,14 @@ namespace EnhancedStreamChat.ChatCoreWrapper
         }
 
         /// <summary>
-        /// ChatCore の設定 Web ポータルを起動します。
+        /// ChatCore の設定 Web アプリを起動します。
         /// </summary>
-        public void LaunchWebPortal(bool shouldLaunchPortal = true)
+        public void LaunchWebApp(bool shouldLaunchWebApp = true)
         {
-            if (!shouldLaunchPortal) {
+            if (!shouldLaunchWebApp) {
                 return;
             }
-            this._instance?.LaunchWebPortal();
+            this._instance?.LaunchWebApp();
         }
 
         // ChatCore v2 では IRC の直接起動 API が公開されていないため no-op。
