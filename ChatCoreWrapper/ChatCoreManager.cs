@@ -13,14 +13,14 @@ namespace EnhancedStreamChat.ChatCoreWrapper
     {
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // イベント
-        public event Action<IStreamingService> OnAuthenticatedStateChanged;
-        public event Action<IStreamingService> OnChatConnected;
-        public event Action<IStreamingService, IChatChannel> OnJoinChannel;
-        public event Action<IStreamingService, IChatChannel> OnLeaveChannel;
-        public event Action<IStreamingService, IChatChannel> OnRoomStateUpdated;
-        public event Action<IStreamingService, IChatMessage> OnTextMessageReceived;
-        public event Action<IStreamingService, IChatChannel, string> OnMessageDeleted;
-        public event Action<IStreamingService, IChatChannel, string> OnChatCleared;
+        public event Action<IChatService> OnAuthenticatedStateChanged;
+        public event Action<IChatService> OnChatConnected;
+        public event Action<IChatService, IChatChannel> OnJoinChannel;
+        public event Action<IChatService, IChatChannel> OnLeaveChannel;
+        public event Action<IChatService, IChatChannel> OnRoomStateUpdated;
+        public event Action<IChatService, IChatMessage> OnTextMessageReceived;
+        public event Action<IChatService, string> OnMessageDeleted;
+        public event Action<IChatService, string> OnChatCleared;
 
         // ChatCore v2 では PubSub 未サポート。互換維持のため宣言のみ。
         public event OnFollowHandler OnFollow;
@@ -40,14 +40,13 @@ namespace EnhancedStreamChat.ChatCoreWrapper
                 return;
             }
             this._streamingService = this._instance.RunAllServices();
-            this._streamingService.OnAuthenticatedStateChanged += this.StreamingService_OnAuthenticatedStateChanged;
-            this._streamingService.OnChatConnected            += this.StreamingService_OnChatConnected;
-            this._streamingService.OnJoinChannel              += this.StreamingService_OnJoinChannel;
-            this._streamingService.OnLeaveChannel             += this.StreamingService_OnLeaveChannel;
-            this._streamingService.OnRoomStateUpdated         += this.StreamingService_OnRoomStateUpdated;
-            this._streamingService.OnTextMessageReceived      += this.StreamingService_OnTextMessageReceived;
-            this._streamingService.OnMessageDeleted           += this.StreamingService_OnMessageDeleted;
-            this._streamingService.OnChatCleared              += this.StreamingService_OnChatCleared;
+            this._streamingService.OnLogin                  += this.StreamingService_OnLogin;
+            this._streamingService.OnJoinChannel            += this.StreamingService_OnJoinChannel;
+            this._streamingService.OnLeaveChannel           += this.StreamingService_OnLeaveChannel;
+            this._streamingService.OnRoomStateUpdated       += this.StreamingService_OnRoomStateUpdated;
+            this._streamingService.OnTextMessageReceived    += this.StreamingService_OnTextMessageReceived;
+            this._streamingService.OnMessageCleared         += this.StreamingService_OnMessageCleared;
+            this._streamingService.OnChatCleared            += this.StreamingService_OnChatCleared;
         }
 
         /// <summary>
@@ -72,35 +71,38 @@ namespace EnhancedStreamChat.ChatCoreWrapper
 
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // プライベートメソッド（イベント中継）
-        private void StreamingService_OnAuthenticatedStateChanged(IStreamingService service)
-            => this.OnAuthenticatedStateChanged?.Invoke(service);
+        // OnLogin → ICatCoreManager の OnAuthenticatedStateChanged と OnChatConnected 両方に流す
+        private void StreamingService_OnLogin(IChatService service)
+        {
+            this.OnAuthenticatedStateChanged?.Invoke(service);
+            this.OnChatConnected?.Invoke(service);
+        }
 
-        private void StreamingService_OnChatConnected(IStreamingService service)
-            => this.OnChatConnected?.Invoke(service);
-
-        private void StreamingService_OnJoinChannel(IStreamingService service, IChatChannel channel)
+        private void StreamingService_OnJoinChannel(IChatService service, IChatChannel channel)
             => this.OnJoinChannel?.Invoke(service, channel);
 
-        private void StreamingService_OnLeaveChannel(IStreamingService service, IChatChannel channel)
+        private void StreamingService_OnLeaveChannel(IChatService service, IChatChannel channel)
             => this.OnLeaveChannel?.Invoke(service, channel);
 
-        private void StreamingService_OnRoomStateUpdated(IStreamingService service, IChatChannel channel)
+        private void StreamingService_OnRoomStateUpdated(IChatService service, IChatChannel channel)
             => this.OnRoomStateUpdated?.Invoke(service, channel);
 
-        private void StreamingService_OnTextMessageReceived(IStreamingService service, IChatMessage message)
+        private void StreamingService_OnTextMessageReceived(IChatService service, IChatMessage message)
             => this.OnTextMessageReceived?.Invoke(service, message);
 
-        private void StreamingService_OnMessageDeleted(IStreamingService service, IChatChannel channel, string messageId)
-            => this.OnMessageDeleted?.Invoke(service, channel, messageId);
+        // ChatCore v2: OnMessageCleared(IChatService, string messageId)
+        private void StreamingService_OnMessageCleared(IChatService service, string messageId)
+            => this.OnMessageDeleted?.Invoke(service, messageId);
 
-        private void StreamingService_OnChatCleared(IStreamingService service, IChatChannel channel, string userId)
-            => this.OnChatCleared?.Invoke(service, channel, userId);
+        // ChatCore v2: OnChatCleared(IChatService, string userId)
+        private void StreamingService_OnChatCleared(IChatService service, string userId)
+            => this.OnChatCleared?.Invoke(service, userId);
         #endregion
 
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // メンバ変数
         private readonly ChatCoreInstance _instance;
-        private IStreamingService _streamingService;
+        private IChatService _streamingService;
         private bool _disposedValue;
         #endregion
 
@@ -115,14 +117,13 @@ namespace EnhancedStreamChat.ChatCoreWrapper
         {
             if (!this._disposedValue) {
                 if (disposing && this._streamingService != null) {
-                    this._streamingService.OnAuthenticatedStateChanged -= this.StreamingService_OnAuthenticatedStateChanged;
-                    this._streamingService.OnChatConnected            -= this.StreamingService_OnChatConnected;
-                    this._streamingService.OnJoinChannel              -= this.StreamingService_OnJoinChannel;
-                    this._streamingService.OnLeaveChannel             -= this.StreamingService_OnLeaveChannel;
-                    this._streamingService.OnRoomStateUpdated         -= this.StreamingService_OnRoomStateUpdated;
-                    this._streamingService.OnTextMessageReceived      -= this.StreamingService_OnTextMessageReceived;
-                    this._streamingService.OnMessageDeleted           -= this.StreamingService_OnMessageDeleted;
-                    this._streamingService.OnChatCleared              -= this.StreamingService_OnChatCleared;
+                    this._streamingService.OnLogin               -= this.StreamingService_OnLogin;
+                    this._streamingService.OnJoinChannel         -= this.StreamingService_OnJoinChannel;
+                    this._streamingService.OnLeaveChannel        -= this.StreamingService_OnLeaveChannel;
+                    this._streamingService.OnRoomStateUpdated    -= this.StreamingService_OnRoomStateUpdated;
+                    this._streamingService.OnTextMessageReceived -= this.StreamingService_OnTextMessageReceived;
+                    this._streamingService.OnMessageCleared      -= this.StreamingService_OnMessageCleared;
+                    this._streamingService.OnChatCleared         -= this.StreamingService_OnChatCleared;
                     this._instance?.StopAllServices();
                 }
                 this._disposedValue = true;
