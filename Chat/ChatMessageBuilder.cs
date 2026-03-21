@@ -44,7 +44,8 @@ namespace EnhancedStreamChat.Chat
                     {
                         _ = pendingEmoteDownloads.Add(emote.Id);
                         var tcs = new TaskCompletionSource<EnhancedImageInfo>();
-                        _ = SharedCoroutineStarter.Instance.StartCoroutine(this._chatImageProvider.TryCacheSingleImage(emote.Id, emote.Uri, emote.IsAnimated ? ChatImageProvider.ESCAnimationType.GIF : ChatImageProvider.ESCAnimationType.MAYBE_GIF, (info) =>
+                        var (resolvedUri, animationType) = GetEmoteUriAndAnimationType(emote);
+                        _ = SharedCoroutineStarter.Instance.StartCoroutine(this._chatImageProvider.TryCacheSingleImage(emote.Id, resolvedUri, animationType, (info) =>
                         {
                             if (info == null || !font.TryRegisterImageInfo(info, out var character)) {
                                 Logger.Warn($"Failed to register emote \"{emote.Id}\" in font {font.Font.name}.");
@@ -201,6 +202,35 @@ namespace EnhancedStreamChat.Chat
                 Logger.Error($"An exception occurred in ChatMessageBuilder while parsing msg with {msg.Emotes.Count} emotes. Msg: \"{msg.Message}\". {ex}");
             }
             return msg.Message;
+        }
+
+        /// <summary>
+        /// TwitchエモートのURIとアニメーションタイプを解決する。
+        /// ChatCore が v1 静止画URLと IsAnimated=false をハードコードしているため、
+        /// v1 URLを v2 animated URLに書き換えて MAYBE_GIF で処理させることで
+        /// アニメーション/静止画を自動的に振り分ける。
+        /// </summary>
+        private static (string uri, ChatImageProvider.ESCAnimationType animationType) GetEmoteUriAndAnimationType(IChatEmote emote)
+        {
+            var uri = emote.Uri;
+            // Twitch v1 静止画URL → v2 animated GIF URL へ書き換え
+            // 例: https://static-cdn.jtvnw.net/emoticons/v1/305954156/3.0
+            //  →  https://static-cdn.jtvnw.net/emoticons/v2/305954156/animated/dark/3.0
+            if (uri != null && uri.StartsWith("https://static-cdn.jtvnw.net/emoticons/v1/")) {
+                uri = uri
+                    .Replace("static-cdn.jtvnw.net/emoticons/v1/",
+                             "static-cdn.jtvnw.net/emoticons/v2/");
+                if (uri.EndsWith("/3.0")) {
+                    uri = uri.Substring(0, uri.Length - "/3.0".Length) + "/animated/dark/3.0";
+                }
+                // MAYBE_GIF を使うことで:
+                //   アニメーションエモート → GIF89aヘッダ検出 → GIF として処理 (アニメーション)
+                //   静止画エモート        → ヘッダ不一致 → LoadSpriteRaw (静止画)
+                // と自動的に振り分けられる
+                return (uri, ChatImageProvider.ESCAnimationType.MAYBE_GIF);
+            }
+            return (uri, emote.IsAnimated ? ChatImageProvider.ESCAnimationType.GIF
+                                          : ChatImageProvider.ESCAnimationType.MAYBE_GIF);
         }
     }
 }
