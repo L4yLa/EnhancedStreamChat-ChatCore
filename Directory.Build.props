@@ -4,7 +4,6 @@
 	<PropertyGroup>
 		<ImportBSMTTargets>True</ImportBSMTTargets>
 		<BSMTProjectType>BSIPA</BSMTProjectType>
-		<BeatSaberDir>O:\Steam\steamapps\common\BSMGR\BSManager\BSInstances\40.8 ChatCore</BeatSaberDir>
 	</PropertyGroup>
 	<ItemGroup>
 		<OutputCopy Include="$(TargetPath)" OutputPath="Plugins\$(TargetName).dll" />
