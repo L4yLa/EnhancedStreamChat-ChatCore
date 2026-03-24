@@ -29,6 +29,8 @@ namespace EnhancedStreamChat.Chat
 
         public bool IsInitialized { get; private set; } = false;
 
+        public event Action OnFontInitialized;
+
         private TMP_FontAsset _mainFont = null;
 
         public TMP_FontAsset MainFont
@@ -181,6 +183,7 @@ namespace EnhancedStreamChat.Chat
                 this.FontInfo = new EnhancedFontInfo(this.MainFont);
             }
             this.IsInitialized = true;
+            this.OnFontInitialized?.Invoke();
         }
     }
 }
