@@ -40,6 +40,10 @@ namespace EnhancedStreamChat.Chat
                 if (!this._mainFont) {
                     return null;
                 }
+                if (this._mainFont.material == null) {
+                    this._mainFont = null;
+                    return null;
+                }
                 var shader = BeatSaberUtils.TMPNoGlowFontShader;
                 if (shader != null && this._mainFont.material.shader != shader) {
                     this._mainFont.material.shader = shader;
@@ -57,8 +61,12 @@ namespace EnhancedStreamChat.Chat
                 var shader = BeatSaberUtils.TMPNoGlowFontShader;
                 if (shader != null) {
                     foreach (var font in this._fallbackFonts) {
-                        if (font.material.shader != shader) {
-                            font.material.shader = shader;
+                        if (font == null) {
+                            continue;
+                        }
+                        var mat = font.material;
+                        if (mat != null && mat.shader != shader) {
+                            mat.shader = shader;
                         }
                     }
                 }
