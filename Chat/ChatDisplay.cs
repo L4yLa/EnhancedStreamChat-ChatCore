@@ -167,7 +167,7 @@ namespace EnhancedStreamChat.Chat
                 this._bg = this._chatScreen.GetComponentsInChildren<ImageView>().FirstOrDefault(x => x.name == "Background");
                 this._bg.raycastTarget = false;
                 this._bg.material = Instantiate(this._bg.material);
-                this._bg.SetField("_gradient", false);
+                this._bg.gradient = false;
                 this._bg.material.color = Color.white.ColorWithAlpha(1);
                 this._bg.color = this.BackgroundColor;
                 this._bg.SetAllDirty();
