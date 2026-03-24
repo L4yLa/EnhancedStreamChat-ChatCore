@@ -49,6 +49,7 @@ namespace EnhancedStreamChat.Chat
         /// <returns></returns>
         public async Task InitializeAsync(CancellationToken token)
         {
+            this._fontManager.OnFontInitialized += this.OnFontManagerInitialized;
             while (!this._fontManager.IsInitialized) {
                 await Task.Yield();
             }
@@ -115,6 +116,12 @@ namespace EnhancedStreamChat.Chat
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
+        private void OnFontManagerInitialized()
+        {
+            this._fontManager.OnFontInitialized -= this.OnFontManagerInitialized;
+            this.UpdateMessages();
+        }
+
         private void AddMessage(EnhancedTextMeshProUGUIWithBackground newMsg)
         {
             newMsg.AddReciver(this);
@@ -492,6 +499,7 @@ namespace EnhancedStreamChat.Chat
                 if (disposing) {
                     try {
                         this._connectSemaphore.Dispose();
+                        this._fontManager.OnFontInitialized -= this.OnFontManagerInitialized;
                         this._chatConfig.OnConfigChanged -= this.Instance_OnConfigChanged;
                         SceneManager.activeSceneChanged  -= this.SceneManager_activeSceneChanged;
                         // ── イベント解除 ──
