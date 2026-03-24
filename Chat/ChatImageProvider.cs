@@ -206,7 +206,7 @@ namespace EnhancedStreamChat.Chat
             var ret = this._imageInfoContaner.Spawn();
             if (sprite != null) {
                 if (forcedHeight != -1) {
-                    this.SetImageHeight(ref spriteWidth, ref spriteHeight, forcedHeight);
+                    this.SetImageHeight(ref spriteHeight, ref spriteWidth, forcedHeight);
                 }
                 ret.ImageId = id;
                 ret.Sprite = sprite;
