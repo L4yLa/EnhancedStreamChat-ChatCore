@@ -304,16 +304,21 @@ namespace EnhancedStreamChat.Chat
         private void UpdateMessage(EnhancedTextMeshProUGUIWithBackground msg, bool setAllDirty = false)
         {
             (msg.transform as RectTransform).sizeDelta = new Vector2(this.ChatWidth, (msg.transform as RectTransform).sizeDelta.y);
-            msg.Text.font = this._fontManager.MainFont;
-            msg.Text.font.fallbackFontAssetTable = this._fontManager.FallBackFonts;
+            var mainFont = this._fontManager.MainFont;
+            if (mainFont != null) {
+                msg.Text.font = mainFont;
+                msg.Text.font.fallbackFontAssetTable = this._fontManager.FallBackFonts;
+            }
             msg.Text.overflowMode = TextOverflowModes.Overflow;
             msg.Text.alignment    = TextAlignmentOptions.BottomLeft;
             msg.Text.color        = this.TextColor;
             msg.Text.fontSize     = this.FontSize;
             msg.Text.lineSpacing  = 1.5f;
 
-            msg.SubText.font = this._fontManager.MainFont;
-            msg.SubText.font.fallbackFontAssetTable = this._fontManager.FallBackFonts;
+            if (mainFont != null) {
+                msg.SubText.font = mainFont;
+                msg.SubText.font.fallbackFontAssetTable = this._fontManager.FallBackFonts;
+            }
             msg.SubText.overflowMode = TextOverflowModes.Overflow;
             msg.SubText.alignment    = TextAlignmentOptions.BottomLeft;
             msg.SubText.color        = this.TextColor;
@@ -496,7 +501,9 @@ namespace EnhancedStreamChat.Chat
                         this._chatCoreManager.OnTextMessageReceived -= this.ChatCoreManager_OnTextMessageReceived;
                         this._chatCoreManager.OnMessageDeleted      -= this.OnChatCoreManager_OnMessageDeleted;
                         this._chatCoreManager.OnChatCleared         -= this.OnChatCoreManager_OnChatCleared;
-                        this.StopAllCoroutines();
+                        if (this) {
+                            this.StopAllCoroutines();
+                        }
                         while (this._messages.TryDequeue(out var msg)) {
                             if (msg) {
                                 msg.RemoveReciver(this);

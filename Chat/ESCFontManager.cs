@@ -38,8 +38,9 @@ namespace EnhancedStreamChat.Chat
                 if (!this._mainFont) {
                     return null;
                 }
-                if (this._mainFont.material.shader != BeatSaberUtils.TMPNoGlowFontShader) {
-                    this._mainFont.material.shader = BeatSaberUtils.TMPNoGlowFontShader;
+                var shader = BeatSaberUtils.TMPNoGlowFontShader;
+                if (shader != null && this._mainFont.material.shader != shader) {
+                    this._mainFont.material.shader = shader;
                 }
                 return this._mainFont;
             }
@@ -51,9 +52,12 @@ namespace EnhancedStreamChat.Chat
         {
             get
             {
-                foreach (var font in this._fallbackFonts) {
-                    if (font.material.shader != BeatSaberUtils.TMPNoGlowFontShader) {
-                        font.material.shader = BeatSaberUtils.TMPNoGlowFontShader;
+                var shader = BeatSaberUtils.TMPNoGlowFontShader;
+                if (shader != null) {
+                    foreach (var font in this._fallbackFonts) {
+                        if (font.material.shader != shader) {
+                            font.material.shader = shader;
+                        }
                     }
                 }
                 return this._fallbackFonts;
@@ -137,9 +141,13 @@ namespace EnhancedStreamChat.Chat
                 else {
                     Logger.Error($"Could not find font {fontName}! Falling back to Segoe UI");
                     fontName = "Segoe UI";
-                    _ = FontManager.TryGetTMPFontByFamily(fontName, out asset);
-                    asset.ReadFontAssetDefinition();
-                    this.MainFont = asset;
+                    if (FontManager.TryGetTMPFontByFamily(fontName, out asset) && asset != null) {
+                        asset.ReadFontAssetDefinition();
+                        this.MainFont = asset;
+                    }
+                    else {
+                        Logger.Error("Could not find Segoe UI font either! Font initialization failed.");
+                    }
                 }
             }
             this._fallbackFonts.Clear();
