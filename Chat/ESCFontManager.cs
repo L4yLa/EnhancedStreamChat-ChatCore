@@ -77,6 +77,7 @@ namespace EnhancedStreamChat.Chat
             yield return new WaitWhile(() => BeatSaberUtils.TMPNoGlowFontShader == null);
             if (this.MainFont != null) {
                 GameObject.Destroy(this.MainFont);
+                this._mainFont = null;
             }
             foreach (var font in this.FallBackFonts) {
                 if (font != null) {
