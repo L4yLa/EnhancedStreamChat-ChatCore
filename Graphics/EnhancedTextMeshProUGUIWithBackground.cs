@@ -1,4 +1,5 @@
-﻿using EnhancedStreamChat.Interfaces;
+﻿using EnhancedStreamChat.Chat;
+using EnhancedStreamChat.Interfaces;
 using EnhancedStreamChat.Utilities;
 using HMUI;
 using System;
@@ -136,6 +137,14 @@ namespace EnhancedStreamChat.Graphics
 
         public class Pool : MonoMemoryPool<EnhancedTextMeshProUGUIWithBackground>
         {
+            private ESCFontManager _fontManager;
+
+            [Inject]
+            public void Construct(ESCFontManager fontManager)
+            {
+                _fontManager = fontManager;
+            }
+
             protected override void OnCreated(EnhancedTextMeshProUGUIWithBackground item)
             {
                 base.OnCreated(item);
@@ -180,6 +189,16 @@ namespace EnhancedStreamChat.Graphics
                 }
                 if (item._accent.material != BeatSaberUtils.UINoGlowMaterial) {
                     item._accent.material = BeatSaberUtils.UINoGlowMaterial;
+                }
+                var font = this._fontManager?.MainFont;
+                if (font != null) {
+                    font.fallbackFontAssetTable = this._fontManager.FallBackFonts;
+                    if (item.Text != null) {
+                        item.Text.font = font;
+                    }
+                    if (item.SubText != null) {
+                        item.SubText.font = font;
+                    }
                 }
             }
             protected override void Reinitialize(EnhancedTextMeshProUGUIWithBackground msg)
