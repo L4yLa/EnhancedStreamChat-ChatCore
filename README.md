@@ -1,3 +1,7 @@
+# Copyrights
+[EnhancedStreamChat-v3](https://github.com/denpadokei/EnhancedStreamChat-v3)  
+© 2025 denpadokei
+
 # EnhancedStreamChat-ChatCore
 [@denpadokei/EnhancedStreamChat-v3](https://github.com/denpadokei/EnhancedStreamChat-v3) を ChatCore 依存に改変したものです。
   
