@@ -210,7 +210,7 @@ namespace EnhancedStreamChat.Chat
         /// v1 URLを v2 animated URLに書き換えて MAYBE_GIF で処理させることで
         /// アニメーション/静止画を自動的に振り分ける。
         /// </summary>
-        private static (string uri, ChatImageProvider.ESCAnimationType animationType) GetEmoteUriAndAnimationType(IChatEmote emote)
+        public static (string uri, ChatImageProvider.ESCAnimationType animationType) GetEmoteUriAndAnimationType(IChatEmote emote)
         {
             var uri = emote.Uri;
             // Twitch v1 静止画URL → v2 animated GIF URL へ書き換え
@@ -221,7 +221,7 @@ namespace EnhancedStreamChat.Chat
                     .Replace("static-cdn.jtvnw.net/emoticons/v1/",
                              "static-cdn.jtvnw.net/emoticons/v2/");
                 if (uri.EndsWith("/3.0")) {
-                    uri = uri.Substring(0, uri.Length - "/3.0".Length) + "/animated/dark/3.0";
+                    uri = uri.Substring(0, uri.Length - "/3.0".Length) + "/default/dark/3.0";
                 }
                 // MAYBE_GIF を使うことで:
                 //   アニメーションエモート → GIF89aヘッダ検出 → GIF として処理 (アニメーション)
