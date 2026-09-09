@@ -14,6 +14,7 @@ using SiraUtil.Zenject;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -389,6 +390,19 @@ namespace EnhancedStreamChat.Chat
             msg.SubTextEnabled = false;
         }
 
+        /// <summary>tmi-sent-ts(UTCエポックms)を優先し、無ければ受信時刻を使って HH:mm を返す。</summary>
+        private static string GetTimestampText(IESCChatMessage msg, DateTime date)
+        {
+            var time = date;
+            if (msg.Metadata != null
+                && msg.Metadata.TryGetValue("tmi-sent-ts", out var ts)
+                && long.TryParse(ts, NumberStyles.None, CultureInfo.InvariantCulture, out var unixMs)
+                && unixMs > 0L && unixMs <= 253402300799999L) {
+                time = DateTimeOffset.FromUnixTimeMilliseconds(unixMs).ToLocalTime().DateTime;
+            }
+            return time.ToString("HH:mm", CultureInfo.InvariantCulture);
+        }
+
         private void CreateMessage(IESCChatMessage msg, DateTime date, string mainMessage, string subMassage)
         {
             _ = MainThreadInvoker.Invoke(() =>
@@ -396,7 +410,9 @@ namespace EnhancedStreamChat.Chat
                 var newMsg = this._textPoolContaner.Spawn();
                 newMsg.transform.SetParent(this._chatContainer.transform, false);
                 newMsg.Text.ChatMessage    = msg;
-                newMsg.Text.text           = mainMessage;
+                newMsg.Text.text           = (this._chatConfig.ShowTimestamp && !msg.IsSystemMessage)
+                                                 ? $"{GetTimestampText(msg, date)} {mainMessage}"
+                                                 : mainMessage;
                 newMsg.SubText.text        = subMassage;
                 newMsg.SubText.ChatMessage = msg;
                 newMsg.SubTextEnabled      = !string.IsNullOrEmpty(msg.SubMessage);

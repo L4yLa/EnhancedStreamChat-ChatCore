@@ -96,6 +96,9 @@ namespace EnhancedStreamChat.Chat
             else if (e.PropertyName == nameof(this.ReverseChatOrder)) {
                 this._chatConfig.ReverseChatOrder = this.ReverseChatOrder;
             }
+            else if (e.PropertyName == nameof(this.ShowTimestamp)) {
+                this._chatConfig.ShowTimestamp = this.ShowTimestamp;
+            }
             else if (e.PropertyName == nameof(this.SyncOrientation)) {
                 this._chatConfig.SyncOrientation = this.SyncOrientation;
                 if (this._chatConfig.SyncOrientation) {
@@ -367,6 +370,14 @@ namespace EnhancedStreamChat.Chat
             }
         }
 
+        private bool _showTimestamp;
+        [UIValue("show-timestamp")]
+        public bool ShowTimestamp
+        {
+            get => this._showTimestamp;
+            set => this.SetProperty(ref this._showTimestamp, value);
+        }
+
         /// <summary>説明 を取得、設定</summary>
         private bool _reconnectEnable = true;
         [UIValue("re-connect-enable")]
@@ -468,6 +479,7 @@ namespace EnhancedStreamChat.Chat
             this.HighlightColor = this._chatConfig.HighlightColor;
             this.PingColor = this._chatConfig.PingColor;
             this.ReverseChatOrder = this._chatConfig.ReverseChatOrder;
+            this.ShowTimestamp = this._chatConfig.ShowTimestamp;
             this.SyncOrientation = this._chatConfig.SyncOrientation;
             if (this._isInGame) {
                 this.ChatPosition = this._chatConfig.Song_ChatPosition;
