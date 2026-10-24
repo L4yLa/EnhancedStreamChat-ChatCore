@@ -65,7 +65,11 @@ namespace EnhancedStreamChat.Chat
                 Logger.Info($"Request already active for {uri}");
                 activeDownload.Finally -= Finally;
                 activeDownload.Finally += Finally;
-                yield return new WaitUntil(() => activeDownload.IsCompleted);
+                // 失敗・リトライ経路では IsCompleted が立たないため、
+                // 「_activeDownloads からキーが消えた」ことも終了条件に含める。
+                // 全ての終了経路が TryRemove を呼ぶので、これで確実に抜けられる。
+                yield return new WaitUntil(() => activeDownload.IsCompleted
+                                              || !this._activeDownloads.ContainsKey(uri));
                 yield break;
             }
             using (var wr = UnityWebRequest.Get(uri)) {
@@ -91,6 +95,7 @@ namespace EnhancedStreamChat.Chat
                             _ = SharedCoroutineStarter.Instance.StartCoroutine(this.DownloadContent(uri, Finally, true));
                             yield break;
                         }
+                        activeDownload.IsCompleted = true;
                         activeDownload.Finally?.Invoke(new byte[0]);
                         _ = this._activeDownloads.TryRemove(uri, out var d2);
                         yield break;
@@ -98,6 +103,7 @@ namespace EnhancedStreamChat.Chat
                     default:
                         // Failed to download due to http error, don't retry
                         Logger.Error($"An http error occurred during request to {uri}. Aborting! {wr.error}");
+                        activeDownload.IsCompleted = true;
                         activeDownload.Finally?.Invoke(new byte[0]);
                         _ = this._activeDownloads.TryRemove(uri, out var d1);
                         yield break;

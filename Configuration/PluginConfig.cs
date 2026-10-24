@@ -36,6 +36,7 @@ namespace EnhancedStreamChat.Configuration
         public virtual bool AllowMovement { get; set; } = false;
         public virtual bool SyncOrientation { get; set; } = false;
         public virtual bool ReverseChatOrder { get; set; } = false;
+        public virtual bool ShowTimestamp { get; set; } = false;
         [UseConverter(typeof(Vector3Conveter))]
         public virtual Vector3 Menu_ChatPosition { get; set; } = new Vector3(0, 3.75f, 2.5f);
         [UseConverter(typeof(Vector3Conveter))]
