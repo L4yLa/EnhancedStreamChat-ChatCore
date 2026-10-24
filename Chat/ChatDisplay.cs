@@ -491,8 +491,6 @@ namespace EnhancedStreamChat.Chat
         private bool _disposedValue;
         private static readonly string s_menu = "MainMenu";
         private static readonly string s_game = "GameCore";
-        private static readonly int s_reconnectDelay = 500;
-        private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private GameObject _chatContainer;
         private GameObject _rootGameObject;
         #endregion
@@ -504,6 +502,8 @@ namespace EnhancedStreamChat.Chat
         {
             this._textPoolContaner   = new MemoryPoolContainer<EnhancedTextMeshProUGUIWithBackground>(pool);
             this._chatConfig         = config;
+            // メニュー側の設定画面が ChatDisplay の BSML 解析前に参照しても正しい値になるよう、構築時に設定値で初期化する。
+            this._layer              = config.Layer.ToString();
             this._chatCoreManager     = chatCoreManager;
             this._chatMessageBuilder = chatMessageBuilder;
             this._fontManager        = fontManager;
@@ -514,7 +514,6 @@ namespace EnhancedStreamChat.Chat
             if (!this._disposedValue) {
                 if (disposing) {
                     try {
-                        this._connectSemaphore.Dispose();
                         this._fontManager.OnFontInitialized -= this.OnFontManagerInitialized;
                         this._chatConfig.OnConfigChanged -= this.Instance_OnConfigChanged;
                         SceneManager.activeSceneChanged  -= this.SceneManager_activeSceneChanged;

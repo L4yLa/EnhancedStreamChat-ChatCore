@@ -4,6 +4,7 @@ using ChatCore.Services;
 using EnhancedStreamChat.Interfaces;
 using IPA.Logging;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Zenject;
 
@@ -60,6 +61,28 @@ namespace EnhancedStreamChat.ChatCoreWrapper
             this._instance?.LaunchWebApp();
         }
 
+        /// <summary>
+        /// ChatCore の設定「ゲーム起動時に Web アプリを開く」(settings.ini の LaunchWebAppOnStartup) を取得・設定します。
+        /// ChatCore はこの値を初期化時に読むため、変更は次回のゲーム起動から有効になります。
+        /// 設定オブジェクトを取得できない場合、取得は false を返し、設定は何もしません。
+        /// </summary>
+        public bool LaunchWebAppOnStartup
+        {
+            get => this.GetMainSettings()?.LaunchWebAppOnStartup ?? false;
+            set
+            {
+                var settings = this.GetMainSettings();
+                if (settings == null || settings.LaunchWebAppOnStartup == value) {
+                    return;
+                }
+                settings.LaunchWebAppOnStartup = value;
+                settings.Save();
+            }
+        }
+
+        /// <summary>ChatCore の設定オブジェクトにアクセスできるかどうか。</summary>
+        public bool IsMainSettingsAvailable => this.GetMainSettings() != null;
+
         // ChatCore v2 では IRC の直接起動 API が公開されていないため no-op。
         public Task IrcStart()  => Task.CompletedTask;
         public Task IrcStop()   => Task.CompletedTask;
@@ -99,8 +122,36 @@ namespace EnhancedStreamChat.ChatCoreWrapper
             => this.OnChatCleared?.Invoke(service, userId);
         #endregion
 
+        /// <summary>
+        /// ChatCore 内部の DI コンテナから設定オブジェクトを取得します。
+        /// ChatCore v2 は MainSettingsProvider を公開 API で提供していないため、
+        /// ChatCoreInstance の非公開静的フィールド _serviceProvider を反射で参照します。
+        /// </summary>
+        private MainSettingsProvider GetMainSettings()
+        {
+            try {
+                var provider = s_serviceProviderField?.GetValue(null) as IServiceProvider;
+                var settings = provider?.GetService(typeof(MainSettingsProvider)) as MainSettingsProvider;
+                if (settings == null && !this._settingsAccessErrorLogged) {
+                    this._settingsAccessErrorLogged = true;
+                    Logger.Error("Failed to access ChatCore MainSettingsProvider.");
+                }
+                return settings;
+            }
+            catch (Exception e) {
+                if (!this._settingsAccessErrorLogged) {
+                    this._settingsAccessErrorLogged = true;
+                    Logger.Error(e);
+                }
+                return null;
+            }
+        }
+
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ
         #region // メンバ変数
+        private static readonly FieldInfo s_serviceProviderField
+            = typeof(ChatCoreInstance).GetField("_serviceProvider", BindingFlags.NonPublic | BindingFlags.Static);
+        private bool _settingsAccessErrorLogged;
         private readonly ChatCoreInstance _instance;
         private IChatService _streamingService;
         private bool _disposedValue;

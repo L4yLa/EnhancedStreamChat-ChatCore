@@ -1,0 +1,7 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <vertical child-control-height='false' child-expand-height='false' child-align='UpperCenter' pad-top='5' spacing='2' pref-width='110'>
+    <dropdown-list-setting text='Layer' value='layer-type' choices='layer-types' apply-on-change='true' bind-value='true'></dropdown-list-setting>
+    <bool-setting text='ゲーム起動時にChatCoreのページを開く' value='launch-web-app-on-startup' apply-on-change='true' bind-value='true' interactable='~is-main-settings-available'></bool-setting>
+    <button text='ChatCoreのページを開く' on-click='launch-web-app'></button>
+  </vertical>
+</bg>

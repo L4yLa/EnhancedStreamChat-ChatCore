@@ -378,38 +378,6 @@ namespace EnhancedStreamChat.Chat
             set => this.SetProperty(ref this._showTimestamp, value);
         }
 
-        /// <summary>説明 を取得、設定</summary>
-        private bool _reconnectEnable = true;
-        [UIValue("re-connect-enable")]
-        /// <summary>説明 を取得、設定</summary>
-        public bool ReconnectEnable
-        {
-            get => this._reconnectEnable;
-
-            set => this.SetProperty(ref this._reconnectEnable, value);
-        }
-
-        [UIValue("mod-version")]
-        public string ModVersion => Plugin.Version;
-
-        [UIAction("launch-web-app")]
-        protected void LaunchWebApp()
-        {
-            this._chatCoreManager.LaunchWebApp();
-        }
-
-        [UIAction("launch-kofi")]
-        protected void LaunchKofi()
-        {
-            Application.OpenURL("https://ko-fi.com/brian91292");
-        }
-
-        [UIAction("launch-github")]
-        protected void LaunchGitHub()
-        {
-            Application.OpenURL("https://github.com/denpadokei/EnhancedStreamChat-v3");
-        }
-
         [UIAction("on-settings-clicked")]
         protected void OnSettingsClick()
         {
@@ -420,42 +388,6 @@ namespace EnhancedStreamChat.Chat
         protected void OnHideSettings()
         {
             Logger.Info("Saving settings!");
-        }
-
-        [UIAction("re-connect")]
-        protected async void ReIrcConnect()
-        {
-            if (!this.ReconnectEnable) {
-                return;
-            }
-            await this._connectSemaphore.WaitAsync();
-            try {
-                this.ReconnectEnable = false;
-                await Task.Delay(s_reconnectDelay);
-                await this._chatCoreManager.IrcStart();
-            }
-            catch (System.Exception e) {
-                Logger.Error(e);
-            }
-            finally {
-                this.ReconnectEnable = true;
-                _ = this._connectSemaphore.Release();
-            }
-        }
-
-        protected async void PubSubReconnect(object instance)
-        {
-            await this._connectSemaphore.WaitAsync();
-            try {
-                await Task.Delay(s_reconnectDelay);
-                await this._chatCoreManager.PubSubStart(instance);
-            }
-            catch (System.Exception e) {
-                Logger.Error(e);
-            }
-            finally {
-                _ = this._connectSemaphore.Release();
-            }
         }
 
         private void HideSettings()

@@ -15,7 +15,6 @@ namespace EnhancedStreamChat.Interfaces
         int ChatWidth { get; set; }
         float FontSize { get; set; }
         Color HighlightColor { get; set; }
-        string ModVersion { get; }
         Color PingColor { get; set; }
         bool ReverseChatOrder { get; set; }
         int SettingsWidth { get; set; }

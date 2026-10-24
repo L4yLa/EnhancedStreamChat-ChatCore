@@ -151,7 +151,7 @@
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="Chat\ChatDisplay.bsml" />
     <EmbeddedResource Include="Resources\Settings.png" />
-    <EmbeddedResource Include="Resources\PizzaDog.jpg" />
+    <EmbeddedResource Include="UI\ESCSettingsViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks" Version="2.0.0-beta7">
